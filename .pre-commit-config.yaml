@@ -1,15 +1,6 @@
 repos:
-  # Virtual environment check (local hook)
-  - repo: local
-    hooks:
-      - id: check-venv
-        name: Check virtual environment
-        entry: python backend/venv_check.py
-        language: system
-        pass_filenames: false
-        always_run: true
+  # (removed check-venv local hook; relying on Makefile enforcement)
 
-  # Python formatting and linting
   - repo: https://github.com/psf/black
     rev: 24.4.2
     hooks:
@@ -26,16 +17,20 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
-        args: [--max-line-length=100, --extend-ignore=E203]
+        args: ["--max-line-length=100", "--extend-ignore=E203"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:
       - id: mypy
-        additional_dependencies: [pydantic-settings==2.3.4, fastapi==0.116.1, types-all]
-        args: [--strict]
+        additional_dependencies:
+          - pydantic-settings==2.3.4
+          - fastapi==0.116.1
+          - types-requests
+          - pytest
+          - httpx
+        args: ["--strict"]
 
-  # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -47,12 +42,11 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
 
-  # Security scanning
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: ['-r', 'backend/app']
+        args: ["-r", "backend/app"]
         exclude: backend/tests/

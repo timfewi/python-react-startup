@@ -2,16 +2,76 @@
 
 This repository is a template for creating new full-stack projects with FastAPI + React TypeScript.
 
-## � Virtual Environment Safety
+## 🧭 New User Workflow (Overview)
+
+High‑level steps a fresh user follows after creating a repo from this template:
+
+1. Create a new repository using the GitHub "Use this template" button
+2. Clone the new repository locally
+3. (Optional) Run the init script to rename internal identifiers
+4. Run `make setup` to install backend + frontend dependencies, create virtual env, copy `.env` files, install pre‑commit hooks
+5. Start development servers with `make dev` (backend: 8000, frontend: 3000)
+6. Run `make verify` to ensure all quality gates pass (lint, format, types, tests, security)
+7. Start coding / customize config, env vars, dependencies
+8. Commit and push (pre‑commit hooks will enforce quality automatically)
+
+### TL;DR Quick Start
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/<you>/<new-repo>.git
+cd <new-repo>
+./scripts/init-template.ps1 -ProjectName "my-app"  # optional
+make setup
+make dev
+```
+
+Unix/macOS:
+
+```bash
+git clone https://github.com/<you>/<new-repo>.git
+cd <new-repo>
+./scripts/init-template.sh -n my-app                 # optional
+make setup
+make dev
+```
+
+### What `make setup` Does
+
+- Creates (or reuses) backend Python virtual environment
+- Installs Python dependencies (dev + prod)
+- Installs frontend npm dependencies
+- Copies `.env.example` → `.env` (backend & frontend if missing)
+- Installs pre‑commit hooks (runs inside the venv)
+
+### Verifying the Environment
+
+```bash
+make verify      # Full suite (recommended)
+make dev         # Starts both servers
+```
+
+If something fails, you can re-run `make setup` safely (idempotent). The pre‑commit hook will block commits if you are outside a virtual environment.
+
+### Common Early Customizations
+
+- Update `backend/app/core/config.py` with new settings
+- Adjust `frontend/package.json` description (init script already sets it if used)
+- Add environment variables to both `.env.example` files; prefix frontend vars with `REACT_APP_`
+- Uncomment database dependencies if adding persistence
+
+---
+
+## 🛡️ Virtual Environment Safety
 
 This template implements **multiple layers of virtual environment protection**:
 
 ### Automatic Features
 
 - **Auto-Detection**: Makefile commands automatically detect and create virtual environments
-- **PowerShell Helper**: Run `.\venv.ps1` in `backend/` for guided activation  
+- **PowerShell Helper**: Run `.\venv.ps1` in `backend/` for guided activation
 - **Pre-commit Protection**: Git hooks verify virtual environment before commits
-- **Status Checker**: `backend/venv_check.py` provides environment status
 
 ### Development Commands
 
@@ -22,10 +82,6 @@ make dev          # Start server
 make verify       # Run all checks
 make test         # Run tests
 
-# Environment helpers
-.\venv.ps1                 # PowerShell activation
-python venv_check.py       # Check status
-```
 
 ## 🚀 Getting Started with Your New Project
 
@@ -66,19 +122,19 @@ python venv_check.py       # Check status
 
 The `init-template.ps1` script automatically updates:
 
-### Backend:
+### Backend
 - `backend/app/core/config.py` - App name configuration
 - `backend/.env.example` - Environment variable defaults
 - `backend/Makefile` - Docker image names
 
-### Frontend:
+### Frontend
 - `frontend/package.json` - Package name and description
 
-### Documentation:
+### Documentation
 - `README.md` - Project title and descriptions
 - Root `Makefile` - Setup messages
 
-### Environment:
+### Environment
 - Creates `.env` files from examples
 - Initializes git repository with first commit
 

@@ -27,6 +27,7 @@ Follow software engineering fundamentals for maintainable, scalable code.
 ## Code Quality Guidelines
 
 - Write self-documenting code with meaningful names
+- Maximum line length of 100 characters (to match flake8 configuration)
 - Prioritize readability over cleverness
 - Handle errors gracefully with appropriate exception handling
 - Use consistent naming conventions and formatting

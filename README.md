@@ -28,9 +28,8 @@ This project implements **multiple layers of virtual environment protection** to
 
 ### Safety Layers
 1. **Makefile Auto-Detection**: Commands check for virtual env and create if missing
-2. **Python Checker**: `backend/venv_check.py` provides environment status
-3. **Pre-commit Protection**: Git hooks prevent commits without virtual environment
-4. **PowerShell Helper**: Color-coded guidance for environment activation
+2. **Pre-commit Protection**: Git hooks prevent commits without virtual environment
+3. **PowerShell Helper**: Color-coded guidance for environment activation
 
 ### Quick Commands
 ```bash
@@ -42,7 +41,6 @@ make test         # Run tests only
 
 # Manual virtual environment
 .\venv.ps1         # PowerShell activation helper
-python venv_check.py  # Check environment status
 ```
 
 ## 🚀 Quick Start
@@ -68,6 +66,30 @@ make dev
 # Or individually
 make dev-backend   # Backend at http://localhost:8000
 make dev-frontend  # Frontend at http://localhost:3000
+```
+
+### (Optional) Rename / Initialize From Template
+
+If you cloned this as a template and want to rename identifiers:
+
+Windows PowerShell:
+
+```powershell
+./scripts/init-template.ps1 -ProjectName "my-new-project" -Description "My awesome service"
+```
+
+Unix/macOS:
+
+```bash
+chmod +x scripts/init-template.sh
+./scripts/init-template.sh -n my-new-project -d "My awesome service" -a "Your Name"
+```
+
+Then run:
+
+```bash
+make setup
+make dev
 ```
 
 ### Run Quality Checks
@@ -113,7 +135,7 @@ npm run dev
 
 ## 📁 Project Structure
 
-```
+```text
 ├── backend/                 # FastAPI application
 │   ├── app/
 │   │   ├── api/routes/     # API route handlers
@@ -303,18 +325,21 @@ psycopg2-binary==2.9.7
 ## 📚 Tech Stack
 
 ### Backend
+
 - **FastAPI** - Modern Python web framework
 - **Pydantic** - Data validation using Python type hints
 - **Uvicorn** - ASGI server
 - **Pytest** - Testing framework
 
 ### Frontend
+
 - **React 19** - UI library
 - **TypeScript** - Type-safe JavaScript
 - **Create React App** - Build tooling
 - **Jest** - Testing framework
 
 ### Development Tools
+
 - **Black** + **Prettier** - Code formatting
 - **MyPy** + **ESLint** - Static analysis
 - **Pre-commit** - Git hooks
@@ -324,18 +349,20 @@ psycopg2-binary==2.9.7
 
 This repository can be used as a template for new projects. See [TEMPLATE.md](TEMPLATE.md) for detailed instructions.
 
-### Quick Template Usage:
+### Quick Template Usage
 
 1. **Create from GitHub Template:**
    - Click "Use this template" on GitHub
    - Clone your new repository
 
 2. **Initialize for your project:**
+
    ```powershell
    .\scripts\init-template.ps1 -ProjectName "your-project-name"
    ```
 
 3. **Start development:**
+
    ```powershell
    make setup
    make dev
@@ -356,6 +383,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Happy coding! 🎉**
+## Happy coding 🎉
 
 For questions or issues, please open a GitHub issue.

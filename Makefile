@@ -33,7 +33,12 @@ install-dev: ## Install development dependencies and setup pre-commit
 	@echo "Installing frontend dependencies..."
 	cd frontend && npm install
 	@echo "Setting up pre-commit hooks..."
-	pre-commit install
+	# Prefer executing pre-commit from the backend virtual environment to avoid relying on a global install
+ifeq ($(OS),Windows_NT)
+	@if exist backend\.venv\Scripts\pre-commit.exe ( backend\.venv\Scripts\pre-commit.exe install ) else ( pre-commit install )
+else
+	@if [ -x backend/.venv/bin/pre-commit ]; then backend/.venv/bin/pre-commit install; else pre-commit install; fi
+endif
 
 dev: ## Start both backend and frontend in development mode
 	@echo "Starting development servers..."
@@ -99,8 +104,13 @@ setup: ## Complete project setup (install deps, setup pre-commit, copy env files
 	@echo "Installing dependencies..."
 	$(MAKE) install-dev
 	@echo "Setting up environment files..."
-	@if [ ! -f backend/.env ]; then cp backend/.env.example backend/.env; echo "Created backend/.env"; fi
-	@if [ ! -f frontend/.env ]; then cp frontend/.env.example frontend/.env; echo "Created frontend/.env"; fi
+ifeq ($(OS),Windows_NT)
+	@if not exist backend\.env ( copy backend\.env.example backend\.env >NUL && echo Created backend/.env )
+	@if not exist frontend\.env ( copy frontend\.env.example frontend\.env >NUL && echo Created frontend/.env )
+else
+	@if [ ! -f backend/.env ]; then cp backend/.env.example backend/.env && echo "Created backend/.env"; fi
+	@if [ ! -f frontend/.env ]; then cp frontend/.env.example frontend/.env && echo "Created frontend/.env"; fi
+endif
 	@echo "Setup complete! Run 'make dev' to start development servers."
 
 bootstrap: setup ## Alias for setup (for convenience)
@@ -124,3 +134,10 @@ quick-start: ## Quick start guide
 	@echo "   make lint          # Lint all code"
 	@echo ""
 	@echo "Run 'make help' for all available commands"
+
+init-project: ## (Optional) Run after cloning template to rename things via PowerShell script (Windows)
+ifeq ($(OS),Windows_NT)
+	@if exist scripts\init-template.ps1 ( powershell -ExecutionPolicy Bypass -File scripts\init-template.ps1 -ProjectName "$(PROJECT_NAME)" ) else ( echo "init-template.ps1 not found" )
+else
+	@echo "Use the PowerShell script scripts/init-template.ps1 on Windows or manually update names."
+endif

@@ -37,7 +37,7 @@ jobs:
         run: |
           black --check app tests
           isort --check-only app tests
-          flake8 app tests
+          flake8 --max-line-length=100 --extend-ignore=E203 app tests
 
       - name: Type Check
         run: mypy app

@@ -7,6 +7,8 @@ PIP := pip
 UVICORN := uvicorn
 APP_MODULE := app.main:app
 VENV_PATH := .venv
+# Sentinel to avoid infinite recursion after creating venv
+AFTER_VENV ?= 0
 
 # Check if we're in a virtual environment or if .venv exists
 ifeq ($(OS),Windows_NT)
@@ -39,12 +41,17 @@ else
     endif
 endif
 
-# Function to ensure virtual environment exists
+# Ensure virtual environment; if created during this invocation, re-run original target(s) with refreshed vars
 ensure-venv:
 ifeq ($(NEEDS_VENV),true)
 	@echo "Creating virtual environment..."
 	$(PYTHON) -m venv $(VENV_PATH)
-	@echo "Virtual environment created. Please run 'make install' to install dependencies."
+	@echo "Virtual environment created. Re-running target to pick up venv python."
+	@# Re-enter make unless we've already done so
+	@if [ "$(AFTER_VENV)" = "0" ]; then \
+		$(MAKE) $(MAKECMDGOALS) AFTER_VENV=1; \
+		exit 0; \
+	fi
 endif
 
 help: ## Show this help message
@@ -74,7 +81,8 @@ install: ensure-venv ## Install dependencies
 install-dev: ensure-venv ## Install development dependencies (including pre-commit)
 	$(PIP_CMD) install -r requirements.txt
 	$(PIP_CMD) install pre-commit coverage
-	$(PYTHON_CMD) -m pre-commit install
+	@echo "Installing pre-commit hook script..."
+	$(PYTHON_CMD) -m pre_commit install
 
 dev: ensure-venv ## Start development server with hot reload
 	@echo "Starting development server..."
