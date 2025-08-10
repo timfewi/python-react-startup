@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  backend:
+    volumes:
+      - ./backend:/app:cached
+    environment:
+      - PYTHONPATH=/app
+      - WATCHFILES_FORCE_POLLING=true
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+
+  frontend:
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm start
+    ports:
+      - "3000:3000"

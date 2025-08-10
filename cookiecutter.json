@@ -1,0 +1,15 @@
+{
+  "project_name": "My Awesome Project",
+  "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-')|replace('_', '-') }}",
+  "project_description": "A full-stack application with FastAPI backend and React frontend",
+  "author_name": "Your Name",
+  "author_email": "your.email@example.com",
+  "version": "0.1.0",
+  "backend_port": "8000",
+  "frontend_port": "3000",
+  "include_database": ["no", "postgresql", "sqlite"],
+  "include_authentication": ["no", "jwt", "oauth"],
+  "include_testing": "yes",
+  "include_docker": "yes",
+  "python_version": "3.13"
+}
