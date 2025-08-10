@@ -33,7 +33,6 @@ install-dev: ## Install development dependencies and setup pre-commit
 	@echo "Installing frontend dependencies..."
 	cd frontend && npm install
 	@echo "Setting up pre-commit hooks..."
-	# Prefer executing pre-commit from the backend virtual environment to avoid relying on a global install
 ifeq ($(OS),Windows_NT)
 	@if exist backend\.venv\Scripts\pre-commit.exe ( backend\.venv\Scripts\pre-commit.exe install ) else ( pre-commit install )
 else
@@ -99,17 +98,17 @@ docker-down: ## Stop services with docker-compose
 docker-logs: ## Show docker-compose logs
 	docker compose logs -f
 
-setup: ## Complete project setup (install deps, setup pre-commit, copy env files)
+setup: ## Complete project setup (install deps, setup pre-commit, create dev env files)
 	@echo "Setting up python-react-startup project..."
 	@echo "Installing dependencies..."
 	$(MAKE) install-dev
-	@echo "Setting up environment files..."
+	@echo "Setting up development environment files (.env.development.local)..."
 ifeq ($(OS),Windows_NT)
-	@if not exist backend\.env ( copy backend\.env.example backend\.env >NUL && echo Created backend/.env )
-	@if not exist frontend\.env ( copy frontend\.env.example frontend\.env >NUL && echo Created frontend/.env )
+	@if not exist backend\.env.development.local ( copy backend\.env.example backend\.env.development.local >NUL && echo Created backend/.env.development.local )
+	@if not exist frontend\.env.development.local ( copy frontend\.env.example frontend\.env.development.local >NUL && echo Created frontend/.env.development.local )
 else
-	@if [ ! -f backend/.env ]; then cp backend/.env.example backend/.env && echo "Created backend/.env"; fi
-	@if [ ! -f frontend/.env ]; then cp frontend/.env.example frontend/.env && echo "Created frontend/.env"; fi
+	@if [ ! -f backend/.env.development.local ]; then cp backend/.env.example backend/.env.development.local && echo "Created backend/.env.development.local"; fi
+	@if [ ! -f frontend/.env.development.local ]; then cp frontend/.env.example frontend/.env.development.local && echo "Created frontend/.env.development.local"; fi
 endif
 	@echo "Setup complete! Run 'make dev' to start development servers."
 

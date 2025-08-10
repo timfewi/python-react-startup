@@ -47,7 +47,6 @@ ifeq ($(NEEDS_VENV),true)
 	@echo "Creating virtual environment..."
 	$(PYTHON) -m venv $(VENV_PATH)
 	@echo "Virtual environment created. Re-running target to pick up venv python."
-	@# Re-enter make unless we've already done so
 	@if [ "$(AFTER_VENV)" = "0" ]; then \
 		$(MAKE) $(MAKECMDGOALS) AFTER_VENV=1; \
 		exit 0; \

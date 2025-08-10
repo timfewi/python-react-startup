@@ -1,0 +1,16 @@
+# Development Dockerfile for React
+FROM node:20-alpine
+WORKDIR /app
+
+# Copy dependency manifests and npm config first (leverage layer cache)
+COPY .npmrc package*.json ./
+
+# Install dependencies (legacy-peer-deps enabled in .npmrc to allow TS 5 with react-scripts 5)
+RUN npm install
+
+# Copy application source
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

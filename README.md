@@ -22,16 +22,19 @@ Opinionated development setup with comprehensive tooling for linting, formatting
 This project implements **multiple layers of virtual environment protection** to ensure consistent development:
 
 ### Automatic Detection & Creation
+
 - **Makefile Commands**: All `make` commands automatically detect and activate virtual environments
-- **PowerShell Script**: Run `.\venv.ps1` in `backend/` for guided activation
+- **PowerShell Script**: Run `\.\venv.ps1` in `backend/` for guided activation
 - **Pre-commit Hooks**: Verify virtual environment before each commit
 
 ### Safety Layers
+
 1. **Makefile Auto-Detection**: Commands check for virtual env and create if missing
 2. **Pre-commit Protection**: Git hooks prevent commits without virtual environment
 3. **PowerShell Helper**: Color-coded guidance for environment activation
 
 ### Quick Commands
+
 ```bash
 # Backend development (auto-activates venv)
 cd backend
@@ -52,6 +55,7 @@ make setup
 ```
 
 This will:
+
 - Install all dependencies (backend + frontend)
 - Set up pre-commit hooks
 - Create environment files from examples
@@ -120,7 +124,9 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
-cp .env.example .env
+
+# Create local dev env file (untracked overrides)
+cp .env.example .env.development.local
 make dev
 ```
 
@@ -129,7 +135,7 @@ make dev
 ```bash
 cd frontend
 npm install
-cp .env.example .env
+cp .env.example .env.development.local
 npm run dev
 ```
 
@@ -233,6 +239,7 @@ npm run test:coverage  # Coverage report
 ### Pre-commit Hooks
 
 Automatically run on each commit:
+
 - Code formatting (Black, Prettier)
 - Linting (Flake8, ESLint)
 - Type checking (MyPy, TypeScript)
@@ -260,24 +267,53 @@ make test           # All tests
 ## 📊 CI/CD Pipeline
 
 GitHub Actions automatically:
+
 - ✅ Lints and type-checks all code
 - ✅ Runs test suites with coverage
 - ✅ Builds Docker images
 - ✅ Scans for security vulnerabilities
 - ✅ Reports coverage to Codecov
 
+### Fast vs Full Pipelines
+
+Two workflows run in this repository:
+
+- `PR Fast Checks` (pr-ci.yml): quick lint/type/test on pull requests (no docker build, minimal minutes)
+- `CI/CD Pipeline` (ci.yml): full validation + docker-compose build (runs on pushes to main/develop)
+
+### Local Dry Run with act
+
+You can run the fast PR workflow locally before pushing using `act`:
+
+```bash
+brew install act # macOS (or see https://github.com/nektos/act#installation)
+act pull_request -j backend-fast
+act pull_request -j frontend-fast
+```
+
+This helps catch failures without consuming hosted minutes.
+
 ## 🚀 Production Deployment
 
 ### Environment Configuration
 
-1. Copy environment examples:
-   ```bash
-   cp backend/.env.example backend/.env
-   cp frontend/.env.example frontend/.env
-   ```
+Local development:
 
-2. Update environment variables for production
-3. Set up secrets in CI/CD environment
+```bash
+cp backend/.env.example backend/.env.development.local
+cp frontend/.env.example frontend/.env.development.local
+```
+
+Production:
+
+- Do NOT create production .env files in the repo or image layers.
+- Provide variables (APP_NAME, ENV=prod, LOG_LEVEL, BACKEND_CORS_ORIGINS, DATABASE_URL, SECRET_KEY, etc.) via your deployment platform (Kubernetes secrets, ECS task definition, Docker swarm secrets, GitHub Actions env/secrets, etc.).
+- `SECRET_KEY` is required when `ENV=prod`; the app will fail fast if it is missing.
+
+Summary:
+
+- backend: `.env.example` (template), `.env.development.local` (ignored), runtime prod uses real env vars
+- frontend: `.env.example`, `.env.development.local`, prod vars injected at build time (CI) or platform
 
 ### Docker Deployment
 
@@ -294,6 +330,7 @@ docker compose -f docker-compose.yml up -d
 ### Adding Dependencies
 
 **Backend:**
+
 ```bash
 cd backend
 pip install new-package
@@ -301,6 +338,7 @@ pip freeze > requirements.txt
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install new-package
@@ -315,6 +353,7 @@ npm install new-package
 ### Database Integration
 
 Uncomment database lines in `backend/requirements.txt`:
+
 ```bash
 # Uncomment these lines
 sqlalchemy==2.0.23
