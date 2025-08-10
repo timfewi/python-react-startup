@@ -156,7 +156,6 @@ npm run dev
 │   └── package.json       # Node dependencies
 ├── .github/workflows/     # CI/CD pipelines
 ├── docker-compose.yml     # Production compose
-├── docker-compose.override.yml  # Development overrides
 ├── Makefile              # Root project commands
 └── .pre-commit-config.yaml  # Git hooks configuration
 ```
