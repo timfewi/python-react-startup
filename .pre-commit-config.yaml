@@ -1,4 +1,14 @@
 repos:
+  # Virtual environment check (local hook)
+  - repo: local
+    hooks:
+      - id: check-venv
+        name: Check virtual environment
+        entry: python backend/venv_check.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
   # Python formatting and linting
   - repo: https://github.com/psf/black
     rev: 24.4.2

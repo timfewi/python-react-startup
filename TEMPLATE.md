@@ -2,7 +2,32 @@
 
 This repository is a template for creating new full-stack projects with FastAPI + React TypeScript.
 
-## 🚀 Quick Start (New Project)
+## � Virtual Environment Safety
+
+This template implements **multiple layers of virtual environment protection**:
+
+### Automatic Features
+
+- **Auto-Detection**: Makefile commands automatically detect and create virtual environments
+- **PowerShell Helper**: Run `.\venv.ps1` in `backend/` for guided activation  
+- **Pre-commit Protection**: Git hooks verify virtual environment before commits
+- **Status Checker**: `backend/venv_check.py` provides environment status
+
+### Development Commands
+
+```bash
+# Backend (auto-activates venv)
+cd backend
+make dev          # Start server
+make verify       # Run all checks
+make test         # Run tests
+
+# Environment helpers
+.\venv.ps1                 # PowerShell activation
+python venv_check.py       # Check status
+```
+
+## 🚀 Getting Started with Your New Project
 
 ### Method 1: GitHub Template (Recommended)
 

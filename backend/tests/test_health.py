@@ -6,10 +6,12 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import pytest
-from fastapi import status
-from httpx import AsyncClient, ASGITransport
-from app.main import app
+import pytest  # noqa: E402
+from fastapi import status  # noqa: E402
+from httpx import ASGITransport, AsyncClient  # noqa: E402
+
+from app.main import app  # noqa: E402
+
 
 @pytest.mark.asyncio
 async def test_health() -> None:

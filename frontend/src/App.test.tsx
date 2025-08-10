@@ -2,8 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders React + FastAPI Starter title', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const titleElement = screen.getByText(/React \+ FastAPI Starter/i);
+  expect(titleElement).toBeInTheDocument();
+});
+
+test('shows backend health status', () => {
+  render(<App />);
+  const healthElement = screen.getByText(/Backend health:/i);
+  expect(healthElement).toBeInTheDocument();
 });

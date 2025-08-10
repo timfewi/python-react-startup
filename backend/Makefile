@@ -8,40 +8,125 @@ UVICORN := uvicorn
 APP_MODULE := app.main:app
 VENV_PATH := .venv
 
+# Check if we're in a virtual environment or if .venv exists
+ifeq ($(OS),Windows_NT)
+    # Windows paths
+    VENV_PYTHON := .venv\Scripts\python.exe
+    VENV_PIP := .venv\Scripts\pip.exe
+    VENV_ACTIVATE := .venv\Scripts\Activate.ps1
+    ifeq ($(wildcard $(VENV_PYTHON)),)
+        PYTHON_CMD := $(PYTHON)
+        PIP_CMD := $(PIP)
+        NEEDS_VENV := true
+    else
+        PYTHON_CMD := $(VENV_PYTHON)
+        PIP_CMD := $(VENV_PIP)
+        NEEDS_VENV := false
+    endif
+else
+    # Unix paths
+    VENV_PYTHON := .venv/bin/python
+    VENV_PIP := .venv/bin/pip
+    VENV_ACTIVATE := .venv/bin/activate
+    ifeq ($(wildcard $(VENV_PYTHON)),)
+        PYTHON_CMD := $(PYTHON)
+        PIP_CMD := $(PIP)
+        NEEDS_VENV := true
+    else
+        PYTHON_CMD := $(VENV_PYTHON)
+        PIP_CMD := $(VENV_PIP)
+        NEEDS_VENV := false
+    endif
+endif
+
+# Function to ensure virtual environment exists
+ensure-venv:
+ifeq ($(NEEDS_VENV),true)
+	@echo "Creating virtual environment..."
+	$(PYTHON) -m venv $(VENV_PATH)
+	@echo "Virtual environment created. Please run 'make install' to install dependencies."
+endif
+
 help: ## Show this help message
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo "Available backend commands:"
+	@echo "  help          Show this help message"
+	@echo "  check-venv    Check if virtual environment is set up"
+	@echo "  setup-venv    Create virtual environment"
+	@echo "  install       Install dependencies"
+	@echo "  install-dev   Install development dependencies and setup pre-commit"
+	@echo "  dev           Start development server with hot reload"
+	@echo "  lint          Run linting (flake8)"
+	@echo "  format        Format code (black + isort)"
+	@echo "  format-check  Check if code is formatted correctly"
+	@echo "  type          Run type checking (mypy)"
+	@echo "  test          Run tests"
+	@echo "  test-cov      Run tests with coverage"
+	@echo "  verify        Run all quality checks"
+	@echo "  clean         Clean up cache files"
+	@echo "  build         Build for production"
+	@echo "  docker-build  Build Docker image"
+	@echo "  docker-run    Run Docker container"
 
-install: ## Install dependencies
-	$(PYTHON) -m pip install --upgrade pip
-	$(PIP) install -r requirements.txt
+install: ensure-venv ## Install dependencies
+	$(PYTHON_CMD) -m pip install --upgrade pip
+	$(PIP_CMD) install -r requirements.txt
 
-install-dev: ## Install development dependencies (including pre-commit)
-	$(PIP) install -r requirements.txt
-	$(PIP) install pre-commit coverage
-	pre-commit install
+install-dev: ensure-venv ## Install development dependencies (including pre-commit)
+	$(PIP_CMD) install -r requirements.txt
+	$(PIP_CMD) install pre-commit coverage
+	$(PYTHON_CMD) -m pre-commit install
 
-dev: ## Start development server with hot reload
-	$(UVICORN) $(APP_MODULE) --reload --host 0.0.0.0 --port 8000
+dev: ensure-venv ## Start development server with hot reload
+	@echo "Starting development server..."
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m uvicorn $(APP_MODULE) --reload --host 0.0.0.0 --port 8000
 
-lint: ## Run linting (flake8)
-	flake8 app tests
+lint: ensure-venv ## Run linting (flake8)
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m flake8 --max-line-length=100 --extend-ignore=E203 app tests
 
-format: ## Format code (black + isort)
-	black app tests
-	isort app tests
+format: ensure-venv ## Format code (black + isort)
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m black app tests
+	$(PYTHON_CMD) -m isort app tests
 
-format-check: ## Check if code is formatted correctly
-	black --check app tests
-	isort --check-only app tests
+format-check: ensure-venv ## Check if code is formatted correctly
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m black --check app tests
+	$(PYTHON_CMD) -m isort --check-only app tests
 
-type: ## Run type checking (mypy)
-	mypy app
+type: ensure-venv ## Run type checking (mypy)
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m mypy app
 
-test: ## Run tests
-	pytest -v
+test: ensure-venv ## Run tests
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m pytest -v
 
-test-cov: ## Run tests with coverage
-	pytest --cov=app --cov-report=term-missing --cov-report=html
+test-cov: ensure-venv ## Run tests with coverage
+ifeq ($(NEEDS_VENV),true)
+	@echo "Please install dependencies first: make install-dev"
+	@exit 1
+endif
+	$(PYTHON_CMD) -m pytest --cov=app --cov-report=term-missing --cov-report=html
 
 verify: format-check lint type test ## Run all quality checks
 
@@ -54,8 +139,8 @@ clean: ## Clean up cache files
 	rm -rf .coverage
 
 build: ## Build for production
-	$(PYTHON) -m pip install --upgrade pip
-	$(PIP) install -r requirements.txt
+	$(PYTHON_CMD) -m pip install --upgrade pip
+	$(PIP_CMD) install -r requirements.txt
 
 docker-build: ## Build Docker image
 	docker build -t python-react-startup-backend .
@@ -65,4 +150,19 @@ docker-run: ## Run Docker container
 
 setup-venv: ## Create virtual environment
 	$(PYTHON) -m venv $(VENV_PATH)
-	@echo "Activate with: source $(VENV_PATH)/bin/activate (Unix) or $(VENV_PATH)\Scripts\Activate.ps1 (Windows)"
+ifeq ($(OS),Windows_NT)
+	@echo "Activate with: $(VENV_ACTIVATE)"
+	@echo "Or run: make install-dev"
+else
+	@echo "Activate with: source $(VENV_ACTIVATE)"
+	@echo "Or run: make install-dev"
+endif
+
+check-venv: ## Check if virtual environment is set up
+ifeq ($(wildcard $(VENV_PYTHON)),)
+	@echo "Virtual environment not found. Creating one..."
+	$(MAKE) setup-venv
+	@echo "Now run: make install-dev"
+else
+	@echo "Virtual environment found at $(VENV_PATH)"
+endif

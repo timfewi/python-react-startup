@@ -1,7 +1,7 @@
 """Application configuration using Pydantic Settings.
 
-Central place for configuration. Avoid importing other application modules here to
-prevent circular imports. Keep only settings definitions and related helpers.
+Central place for configuration. Avoid importing other application modules here
+to prevent circular imports. Keep only settings definitions and related helpers.
 """
 
 from __future__ import annotations
